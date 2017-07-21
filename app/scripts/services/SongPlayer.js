@@ -26,19 +26,42 @@
       preload: true
     });
     currentSong = song;
-    }
+  };
+
+  /**
+* @function playSong
+* @desc plays currentBuzzObject and sets the playing property of song to true.
+* @param {Object} song
+*/
+
+  var playSong = function(song){
+    currentBuzzObject.play();
+    song.playing = true;
+  };
+
+  /**
+* @function SongPlayer.play
+* @desc plays and sets song if current song is null, otherwise just plays song.
+* @param {Object} song
+*/
 
     SongPlayer.play = function(song) {
       if (currentSong !== song) {
-      setSong(song);
-      currentBuzzObject.play();
-      song.playing = true;
+        setSong(song);
+        playSong(song);
     } else if (currentSong === song) {
-      if (currentBuzzObject.isPaused()) {
-        currentBuzzObject.play();
-      }
+        if (currentBuzzObject.isPaused()) {
+          playSong(song);
+        }
     }
-  };
+};
+
+/**
+* @function SongPlayer.pause
+* @desc pauses currentBuzzObject and sets playing property of song to false;
+* @param {Object} song
+*/
+
   SongPlayer.pause = function(song) {
     currentBuzzObject.pause();
     song.playing = false;
