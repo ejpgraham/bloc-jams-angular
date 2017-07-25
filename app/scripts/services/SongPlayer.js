@@ -1,9 +1,9 @@
 (function(){
-  function SongPlayer() {
+  function SongPlayer(Fixtures) {
     var SongPlayer = {};
-
-    var currentSong = null;
+    var currentAlbum = Fixtures.getAlbum();
     var currentBuzzObject = null;
+
 
     /**
     * @function setSong
@@ -14,7 +14,7 @@
     var setSong = function(song){
       if (currentBuzzObject) {
         currentBuzzObject.stop();
-        currentSong.playing = null;
+        SongPlayer.currentSong.playing = null;
       }
       /**
       * @desc Buzz object audio file
@@ -25,7 +25,7 @@
       formats: ['mp3'],
       preload: true
     });
-    currentSong = song;
+      SongPlayer.currentSong = song;
   };
 
   /**
@@ -40,16 +40,31 @@
   };
 
   /**
+* @desc returns index of a song.
+*/
+
+  var getSongIndex = function(song){
+    return currentAlbum.songs.indexOf(song);
+  };
+
+  /**
+  * @desc Active song object from list of songs
+  * @type {Object}
+  */
+  SongPlayer.currentSong = null;
+
+  /**
 * @function SongPlayer.play
 * @desc plays and sets song if current song is null, otherwise just plays song.
 * @param {Object} song
 */
 
     SongPlayer.play = function(song) {
-      if (currentSong !== song) {
+      song = song || SongPlayer.currentSong;
+      if (SongPlayer.currentSong !== song) {
         setSong(song);
         playSong(song);
-    } else if (currentSong === song) {
+    } else if (SongPlayer.currentSong === song) {
         if (currentBuzzObject.isPaused()) {
           playSong(song);
         }
@@ -63,14 +78,37 @@
 */
 
   SongPlayer.pause = function(song) {
+    song = song || SongPlayer.currentSong;
     currentBuzzObject.pause();
     song.playing = false;
+  };
+
+  /**
+  * @function SongPlayer.previous
+  * @desc Uses SongPlayer.currentSong to subtract 1 from the current
+  * @param none
+  */
+
+  SongPlayer.previous = function(){
+    var currentSongIndex = getSongIndex(SongPlayer.currentSong);
+    currentSongIndex--;
+
+    if (currentSongIndex < 0){
+      currentBuzzObject.stop();
+      SongPlayer.currentSong.playing = null;
+    } else {
+      var song = currentAlbum.songs[currentSongIndex];
+      setSong(song);
+      playSong(song);
+    }
   };
 
     return SongPlayer;
   }
 
+
+
   angular
     .module('blocJams')
-    .factory('SongPlayer', SongPlayer);
+    .factory('SongPlayer', ['Fixtures', SongPlayer]);
 })();
